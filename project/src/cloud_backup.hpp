@@ -284,20 +284,41 @@ class Server{
   private:
     //文件上传处理回调函数
     static void FileUpload(const httplib::Request &req,httplib::Response &rsp){
+   //req.method -- 解析出的请求方法
+   //req.path -- 解析出的请求的资源路径
+   //req.headers -- 这是一个头部信息键值对
+   //req.body -- 存放请求数据的正文
+      std::string filename = req.matches[1]; //单纯是文件名称
+      std::string pathname = BACKUP_DIR + filename; //文件备份在指定路径
+      FileUtil::Write(pathname,req.body); //向文件写入数据,文件不存在会创建
+      data_manage.Insert(filename,filename);//添加文件信息到数据管理模块
       rsp.status = 200;
 
+      // rsp.status = 200;
     //set_content(正文数据,正文数据长度,正文数据类型)
-    rsp.set_content("Fileupload",10,"text/html");
-
-   //290行这一步相当于下面这两步
+      // rsp.set_content("Fileupload",10,"text/html");
+   //上面set_content这一步相当于下面这两步,可用下面这两步替换
    //rsp.body = "Fileupload";
    //rsp.set_header("Content-Type","text/html");
     }
+
     //文件列表处理回调函数
     static void FileList(const httplib::Request &req,httplib::Response &rsp){
+      std::vector<std::string> list;
+      data_manage.GetAllName(&list);
+      std::stringstream tmp;
+      tmp << "<html><body><hr />";
+      for(int i = 0;i<list.size(); ++i){
+        tmp << "<a href='/filedownload/'" << list[i] << "'>" <<list[i] << "</a>";
+        //相当于 tmp << "<a href='/filedown/a.txt'>a.txt</a>";
+        tmp << "<hr />";
+      }
+      tmp << "<hr /></body></html>";
+
+      rsp.set_content(tmp.str().c_str(),tmp.str().size(),"text/html");
       rsp.status = 200;
-      rsp.set_content("Filelist",8,"text/html");
     }
+
     //文件下载处理毁掉函数
     static void FileDownload(const httplib::Request &req,httplib::Response &rsp){
       rsp.status = 200;
@@ -308,7 +329,7 @@ class Server{
     Server(){ }
     ~Server(){}
     bool Start(){                //启动网络通信模块接口
-  _server.Put("/Fileupload",FileUpload);
+  _server.Put("/(.*)",FileUpload);
   _server.Get("/Filelist",FileList);
   //正则表达式:.*表示匹配任意字符串  ()表示捕捉这个字符串
   _server.Get("/Filedownload/(.*)",FileDownload);
