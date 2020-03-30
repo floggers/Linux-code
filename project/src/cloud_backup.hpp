@@ -181,6 +181,17 @@ bool GetAllName(std::vector<std::string> *list){
   pthread_rwlock_unlock(&_rwlock);
   return true; 
 }
+
+//根据源文件名称获取压缩包名称
+bool GetGzname(const std::string &src,std::string &dst){
+  auto it = _file_list.find(src);
+  if(it == _file_list.end()){
+    return false;
+  }
+  dst = it->second;
+  return true;
+}
+
 //数据改变后持久化存储,存储的是管理的文件名数据
 bool Storage(){
   //将_file_list中的数据进行持久化的存储
@@ -304,8 +315,11 @@ class Server{
 
     //文件列表处理回调函数
     static void FileList(const httplib::Request &req,httplib::Response &rsp){
+      //1.通过data_manage数据管理获取文件名称列表
       std::vector<std::string> list;
       data_manage.GetAllName(&list);
+
+      //2.组织响应的html网页数据
       std::stringstream tmp;
       tmp << "<html><body><hr />";
       for(int i = 0;i<list.size(); ++i){
@@ -315,15 +329,36 @@ class Server{
       }
       tmp << "<hr /></body></html>";
 
+      //3.填充rsp的正文与状态码还有头部信息
+      //http响应格式:首行(协议版本 状态码 状态码描述) 头部 空行 正文
+      //set_content(正文数据,数据大小,正文类型);
       rsp.set_content(tmp.str().c_str(),tmp.str().size(),"text/html");
       rsp.status = 200;
     }
 
-    //文件下载处理毁掉函数
+    //文件下载处理回调函数
     static void FileDownload(const httplib::Request &req,httplib::Response &rsp){
+    //1.从数据模块判断文件是否存在
+      std::string filename = req.matches[1]; //这就是前面路由注册时捕捉的(.*)
+      if(data_manage.Exists(filename) == false){
+        rsp.status = 404; //文件不存在 page not found
+        return;
+      }
+      //2.判断文件是否已经被压缩, 压缩了则要先解压缩,然后再读取文件数据
+      std::string pathname = BACKUP_DIR + filename; //源文件的备份路径
+      if(data_manage.IsCompressed(filename) == true){
+        //文件被压缩,先将文件解压出来
+        std::string gzfile;
+        data_manage.GetGzname(filename,gzfile); //获取压缩包名称
+        std::string gzpathname = GZFILE_DIR + gzfile; //压缩包的路径名
+        CompressUtil::UnCompress(gzpathname,pathname); //将压缩包解压
+        unlink(gzpathname.c_str()); //删除压缩包
+      }
+      //从文件中读取数据,响应客户端
+      FileUtil::Read(pathname,&rsp.body); //直接将文件数据读取到rsp的body中
+      rsp.set_header("Content-Type","application/octet-stream"); //二进制流下载
       rsp.status = 200;
-      std::string path = req.matches[1]; //matches[1]表示(.*)这个字符串 而matches[0]则表示/Filedownload/(.*)这整个字符串
-      rsp.set_content(path.c_str(),path.size(),"text/html");
+      return;
     }
   public: 
     Server(){ }
