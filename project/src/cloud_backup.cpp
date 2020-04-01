@@ -23,8 +23,18 @@ void data_test(){
   printf("---------------------------------------------\n");
 }
 
+void m_non_compress(){
+  _cloud_sys::NonHotCompress ncom(GZFILE_DIR,BACKUP_DIR);
+  ncom.Start();
+}
+
+void thr_http_server(){
+  _cloud_sys::Server srv;
+  srv.Start();
+}
+
 int main(int argc,char *argv[]){
-  /*
+  _cloud_sys::data_manage.Insert("file","file");
   //文件备份路径不存在则创建
   if(boost::filesystem::exists(GZFILE_DIR) == false){
     boost::filesystem::create_directory(GZFILE_DIR);
@@ -33,11 +43,9 @@ int main(int argc,char *argv[]){
   if(boost::filesystem::exists(BACKUP_DIR) == false){
     boost::filesystem::create_directory(BACKUP_DIR);
   }
-  _cloud_sys::data_manage.Insert("file.tar.gz.txt","file.tar.gz.txt");
-  std::thread thr(m_non_compress); //c++11中的线程
-  thr.jion();//等待线程退出
-  */
-  _cloud_sys::Server server;
-  server.Start();
+  std::thread thr_compress(m_non_compress); //c++11中的线程 -- 启动非热点压缩模块
+  std::thread thr_server(thr_http_server); //网络通信服务端模块启动
+  thr_compress.join();//等待线程退出
+  thr_server.join();
     return 0;
 }
