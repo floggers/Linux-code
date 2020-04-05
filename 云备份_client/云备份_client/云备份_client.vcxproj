@@ -116,7 +116,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="cloud_client.h" />
+    <ClInclude Include="cloud_client.hpp" />
     <ClInclude Include="httplib.h" />
   </ItemGroup>
   <ItemGroup>
