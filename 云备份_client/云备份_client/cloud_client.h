@@ -1,4 +1,5 @@
 #pragma once
+#include "httplib.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -60,6 +61,7 @@ public:
 	{}
 	bool Insert(const string &key, const string &val) { //插入/更新数据
 		m_backup_list[key] = val;
+		Storage();
 		return true;
 	}
 	bool GetETag(const string &key,  string *val) {  //通过文件名获取etag信息
@@ -107,21 +109,51 @@ public:
 	}
 };
 #define STORE_FILE "./list.backup"
-
-DataManager data_manage(STORE_FILE);
+#define LISTEN_DIR "./backup/"
 
 class Cloud_Client {
 private:
+	string m_srv_ip;
+	uint16_t m_srv_port;
 	string m_listen_dir;  //监控的目录名称
+	DataManager data_manage;
 public:
-	Cloud_Client(const string &filename)
-		:m_listen_dir(filename)
+	Cloud_Client(const string &filename,const string &store_file,const string &srv_ip,uint16_t srv_port)
+		:m_listen_dir(filename),
+		data_manage(store_file),
+		m_srv_ip(srv_ip),
+		m_srv_port(srv_port)
 	{}
-	bool Start() {   //完成整体法人文件备份流程
-
+	bool Start() {   
+		data_manage.InitLoad();  //加载以前的备份信息
+		while (1) {
+			vector<string> list;
+			GetBackuoFileList(&list); //获取到所有的需要备份的文件名称
+			for (int i = 0;i < list.size();++i) {
+				string name = list[i];  //文件名
+				string pathname = m_listen_dir + name;  //文件路径名
+				//读取文件数据,作为请求正文
+				string body;
+				FileUtil::Read(pathname, &body);
+				//实例化client对象准备发起HTTP上传文件请求
+				httplib::Client client(m_srv_ip, m_srv_port);
+				string req_path = "/" + name;
+				auto rsp = client.Put(req_path.c_str(), body, "application/octet-stream");
+				if (rsp == nullptr || (rsp != nullptr&&rsp->status != 200)) {  //这个文件上传备份失败
+					continue;
+				}
+				string etag;
+				GetETag(pathname, &etag);
+				data_manage.Insert(name, etag);   //备份成功则插入/更新信息
+			}
+			Sleep(1000);   //休眠1000毫秒  即 1秒后重检测
+		}
 		return true;
 	}
 	bool GetBackuoFileList(vector<string> *list) {  //获取需要备份的文件列表
+		if (boost::filesystem::exists(m_listen_dir) == false) {
+		boost::filesystem::create_directory(m_listen_dir);   //若目录不存在则创建
+		}
 		//1.进行目录监控,获取指定目录下的所有文件名称
 		boost::filesystem::directory_iterator begin(m_listen_dir);
 		boost::filesystem::directory_iterator end;

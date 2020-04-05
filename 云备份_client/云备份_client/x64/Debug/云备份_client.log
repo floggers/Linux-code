@@ -1,24 +1,5 @@
 ﻿  cloud_client.cpp
-d:\编程\vc\tools\msvc\14.11.25503\include\xutility(2294): error C4996: 'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. See documentation on how to use Visual C++ 'Checked Iterators'
-  d:\编程\vc\tools\msvc\14.11.25503\include\xutility(2294): note: 参见“std::copy::_Unchecked_iterators::_Deprecate”的声明
-  d:\编程\比特\boost_1_71_0\boost\algorithm\string\detail\classification.hpp(102): note: 参见对正在编译的函数 模板 实例化“_OutIt *std::copy<const char*,char*>(_InIt,_InIt,_OutIt)”的引用
-          with
-          [
-              _OutIt=char *,
-              _InIt=const char *
-          ]
-  d:\编程\比特\boost_1_71_0\boost\algorithm\string\classification.hpp(206): note: 参见对正在编译的函数 模板 实例化“boost::algorithm::detail::is_any_ofF<char>::is_any_ofF<boost::iterator_range<const char *>>(const RangeT &)”的引用
-          with
-          [
-              RangeT=boost::iterator_range<const char *>
-          ]
-  d:\编程\比特\boost_1_71_0\boost\algorithm\string\classification.hpp(206): note: 参见对正在编译的函数 模板 实例化“boost::algorithm::detail::is_any_ofF<char>::is_any_ofF<boost::iterator_range<const char *>>(const RangeT &)”的引用
-          with
-          [
-              RangeT=boost::iterator_range<const char *>
-          ]
-  d:\编程\source code\linux-code\云备份_client\云备份_client\cloud_client.h(94): note: 参见对正在编译的函数 模板 实例化“boost::algorithm::detail::is_any_ofF<char> boost::algorithm::is_any_of<char[3]>(const RangeT (&))”的引用
-          with
-          [
-              RangeT=char [3]
-          ]
+d:\编程\source code\linux-code\云备份_client\云备份_client\httplib.h(2877): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\编程\source code\linux-code\云备份_client\云备份_client\httplib.h(2882): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  云备份_client.vcxproj -> D:\编程\source code\Linux-code\云备份_client\x64\Debug\云备份_client.exe
+  云备份_client.vcxproj -> D:\编程\source code\Linux-code\云备份_client\x64\Debug\云备份_client.pdb (Partial PDB)

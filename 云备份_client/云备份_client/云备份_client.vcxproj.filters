@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\project\test\httplib.h">
+    <ClInclude Include="cloud_client.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="cloud_client.h">
+    <ClInclude Include="httplib.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
