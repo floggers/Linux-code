@@ -1,5 +1,0 @@
-﻿  cloud_client.cpp
-d:\编程\source code\linux-code\云备份_client\云备份_client\httplib.h(2877): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-d:\编程\source code\linux-code\云备份_client\云备份_client\httplib.h(2882): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-  云备份_client.vcxproj -> D:\编程\source code\Linux-code\云备份_client\x64\Debug\云备份_client.exe
-  云备份_client.vcxproj -> D:\编程\source code\Linux-code\云备份_client\x64\Debug\云备份_client.pdb (Partial PDB)

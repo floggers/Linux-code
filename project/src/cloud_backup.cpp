@@ -2,12 +2,13 @@
 #include <thread>
 
 void compress_test(char *argv[]){
-    //argv[1] = 源文件名称
-    //argv[2] = 压缩包名称
-    _cloud_sys::CompressUtil::Compress(argv[1],argv[2]);
-    std::string file = argv[1];
-    file +=".txt";
-    _cloud_sys::CompressUtil::UnCompress(argv[2],file.c_str());
+  //argv[1] = 源文件名称
+  //    //argv[2] = 压缩包名称
+  _cloud_sys::CompressUtil::Compress(argv[1],argv[2]);
+  std::string file = argv[1];
+  file +=".txt";
+  _cloud_sys::CompressUtil::UnCompress(argv[2],file.c_str());
+
 }
 
 void data_test(){
@@ -47,5 +48,6 @@ int main(int argc,char *argv[]){
   std::thread thr_server(thr_http_server); //网络通信服务端模块启动
   thr_compress.join();//等待线程退出
   thr_server.join();
-    return 0;
+  return 0;
 }
+
