@@ -21,7 +21,6 @@ static Singleton* GetTarget(){
 class Singleton2{
   private:
     Singleton2(){
-
     }
    static  Singleton2* single;
   public:
